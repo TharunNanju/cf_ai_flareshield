@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.cache/
+.env
+/.wrangler
+/.vercel
+frontend/build/
+frontend/.svelte-kit/
+*.log

@@ -1,0 +1,90 @@
+[project]
+name = "cf-ai-flareshield"
+compatibility_date = "2025-09-26"
+
+[[workers.dev]]
+name = "log-processor"
+main = "workers/log-processor/index.ts"
+
+[[workers.dev]]
+name = "api-server"
+main = "workers/api-server/index.ts"
+
+[vars]
+# global vars can go here
+
+[r2_buckets]
+flareshield-logs = {binding = "LOG_BUCKET", bucket_name = "flareshield-logs"}
+
+[[kv_namespaces]]
+binding = "CONFIG_KV"
+namespace_id = "" # fill in with your KV namespace id
+
+[[durable_objects]]
+# none by default
+
+[[d1_databases]]
+binding = "DB"
+database_name = "flareshield-db"
+
+[[realtime_namespaces]]
+binding = "REALTIME"
+namespace_id = "" # fill in with your Realtime namespace id
+
+[services]
+# service bindings can be declared per worker below
+
+[[bindings]]
+type = "r2_bucket"
+binding = "LOG_BUCKET"
+bucket_name = "flareshield-logs"
+
+[[bindings]]
+type = "kv_namespace"
+binding = "CONFIG_KV"
+namespace_id = ""
+
+[[bindings]]
+type = "d1_database"
+binding = "DB"
+database_name = "flareshield-db"
+
+[[bindings]]
+type = "realtime_namespace"
+binding = "REALTIME"
+namespace_id = ""
+
+[[services]]
+name = "API_SERVICE"
+service = "api-server"
+
+[workers]
+  [workers.log-processor]
+  main = "workers/log-processor/index.ts"
+  bindings = [
+    { type = "r2_bucket", binding = "LOG_BUCKET", bucket_name = "flareshield-logs" },
+    { type = "kv_namespace", binding = "CONFIG_KV", namespace_id = "" },
+    { type = "workflow", binding = "THREAT_ANALYSIS_WORKFLOW", workflow = "threat-analysis" }
+  ]
+
+  [workers.api-server]
+  main = "workers/api-server/index.ts"
+  bindings = [
+    { type = "d1_database", binding = "DB", database_name = "flareshield-db" },
+    { type = "realtime_namespace", binding = "REALTIME", namespace_id = "" },
+    { type = "service", binding = "API_SERVICE", service = "api-server" }
+  ]
+
+[triggers]
+# workflow triggers
+
+[pages]
+project = "frontend"
+
+[workflows]
+  [[workflows.threat-analysis]]
+  path = "workflows/threat-analysis.workflow.ts"
+  bindings = [
+    { type = "ai", binding = "AI" },
+    { type = "service", binding = "API_SERVICE", service = "api-server" }
+  ]

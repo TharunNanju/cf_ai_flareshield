@@ -1,0 +1,22 @@
+{
+  "name": "cf-ai-flareshield",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node -e \"const d=new Date().toISOString().slice(0,10); require('child_process').execSync(`wrangler pages dev frontend --local --compatibility-date=${d}`, { stdio: 'inherit' })\"",
+    "deploy": "wrangler publish",
+    "db:migrate": "node ./db/migrations/run-migrations.js"
+  },
+  "dependencies": {
+    "itty-router": "^3.0.7",
+    "svelte": "^4.0.0",
+    "@sveltejs/kit": "next",
+    "@cloudflare/workflows": "^1.0.0",
+    "@cloudflare/workers-types": "^4.202",
+    "wrangler": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-cloudflare": "^4.0.0"
+  }
+}
